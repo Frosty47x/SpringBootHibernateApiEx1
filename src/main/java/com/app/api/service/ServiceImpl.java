@@ -44,7 +44,7 @@ public class ServiceImpl implements Service {
         if (user == null) {
             System.out.println("USER IS NULL");
             User nullUser = new User();
-            nullUser.setId(-1);
+            nullUser.setId((long) -1);
             nullUser.setUsername("NULL");
             nullUser.setPassword("NULL");
             nullUser.setBooks(new ArrayList<>());
