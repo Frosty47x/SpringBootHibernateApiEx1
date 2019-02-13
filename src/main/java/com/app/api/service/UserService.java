@@ -9,6 +9,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,12 +61,19 @@ public class UserService {
         return responseEntity;
     }
 
-
-    public ResponseEntity getUser(User user) {
+    public ResponseEntity getUser(RequestUser user) {
+        List<String> msg = new ArrayList<>();
+        ResponseEntity responseEntity;
         user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
         User dbUser = userDao.getUserByUsernameAndPassword(user.getUsername(), user.getPassword());
-        List<String> msg = new ArrayList<>();
-        return new ResponseUser(dbUser.getId(), msg, dbUser.getUsername(), dbUser.getBooks());
+        if (dbUser != null) {
+            msg.add("200 OK");
+            responseEntity = new ResponseUser(dbUser.getId(), msg, dbUser.getUsername(), dbUser.getBooks());
+        } else {
+            msg.add("NO SUCH USER");
+            responseEntity = new ResponseEntity(-1, msg);
+        }
+        return responseEntity;
     }
 
     public ResponseEntity editUser(RequestUser user) {
@@ -108,12 +116,28 @@ public class UserService {
                 dbUser = userDao.save(dbUser);
                 msg.add("200 OK");
                 responseEntity = new ResponseUser(0, msg, dbUser.getUsername(), dbUser.getBooks());
-            }else {
+            } else {
                 msg.add("BAD REQUEST");
                 responseEntity = new ResponseEntity(-1, msg);
             }
-        }else {
+        } else {
             msg.add("INVALID USERNAME AND/OR PASSWORD");
+            responseEntity = new ResponseEntity(-1, msg);
+        }
+        return responseEntity;
+    }
+
+    public ResponseEntity deleteUser(RequestUser user) {
+        ResponseEntity responseEntity;
+        List<String> msg = new ArrayList<>();
+        user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
+        User dbUser = userDao.getUserByUsernameAndPassword(user.getUsername(), user.getPassword());
+        if (dbUser != null) {
+                userDao.delete(dbUser);
+                msg.add("200 OK");
+                responseEntity = new ResponseEntity(dbUser.getId(), msg);
+        } else {
+            msg.add("NO SUCH USER FOUND");
             responseEntity = new ResponseEntity(-1, msg);
         }
         return responseEntity;

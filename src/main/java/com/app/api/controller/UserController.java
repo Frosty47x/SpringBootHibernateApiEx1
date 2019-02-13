@@ -15,32 +15,25 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     @Autowired
-    private Service service;
-
-    @Autowired
     private UserService userService;
 
-    @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity addUser(@RequestBody RequestUser user) {
         return userService.addUser(user);
     }
 
-    @RequestMapping(method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity editUser(@RequestBody RequestUser user) {
         return userService.editUser(user);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, consumes = "application/json", produces = "application/json")
-    public String deleteUser(@PathVariable long id) {
-        if (service.deleteUser(id)) {
-            return "SUCCESS";
-        } else {
-            return "SOMETHING WENT WRONG";
-        }
+    @DeleteMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity deleteUser(@RequestBody RequestUser user) {
+        return userService.deleteUser(user);
     }
 
     @GetMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity getUserByUsernameAndPassword(@RequestBody User user) {
+    public ResponseEntity getUser(@RequestBody RequestUser user) {
         return userService.getUser(user);
     }
 
@@ -49,8 +42,4 @@ public class UserController {
 //        return service.getAllUsers();
 //    }
 
-    @RequestMapping(value = "/books/{id}", method = RequestMethod.GET, produces = "application/json")
-    public String getBooksForUser(@PathVariable long id) {
-        return service.getBooksForUser(id);
-    }
 }
